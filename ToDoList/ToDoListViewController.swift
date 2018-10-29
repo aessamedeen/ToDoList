@@ -10,12 +10,20 @@ import UIKit
 
 class ToDoListViewController: UITableViewController {
     
-    let itemArray = ["find my girl","marry here","go to alex"]
+    var itemArray = ["find my girl","marry here","go to alex"]
+    
+    let defaults = UserDefaults.standard
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        initializeItemArray()
     }
 
+    func initializeItemArray(){
+        if let items = defaults.array(forKey: "itemsArray") as? [String]{
+            itemArray = items
+        }
+    }
     //MARK: create table view Datasource methods
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -45,6 +53,29 @@ class ToDoListViewController: UITableViewController {
         
     }
 
-
+    //MARK: Add items
+    
+    @IBAction func addItemPressed(_ sender: UIBarButtonItem) {
+        var textField = UITextField()
+        
+        let alert = UIAlertController(title: "Add ToDo", message: "add your new ToDo", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Add", style: .default, handler: { (action) in
+            self.itemArray.append(textField.text!)
+            self.defaults.set(self.itemArray,forKey: "itemsArray")
+            self.updateTableViewItems()
+        })
+        alert.addAction(action)
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "create new item"
+            textField = alertTextField
+        }
+    
+        present(alert,animated: true,completion: nil)
+    }
+    
+    
+    func updateTableViewItems(){
+        tableView.reloadData()
+    }
 }
 
